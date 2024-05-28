@@ -1,0 +1,51 @@
+<html>
+
+<head>
+    <title>Zenunim Y</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+
+<body>
+    <h1>Zenunim Y</h1>
+    <img src="{{ url_for('static', filename='Png.png') }}" width=240 height=240></img>
+
+    <div class="center">
+        <a>=====================================================</a>
+        <form action="/send_student" method="POST">
+            <input type="text" name="student_name" placeholder="Nome do aluno"></input>
+            <input type="text" name="grade" placeholder="Turma"></input>
+            <input type="text" name="date" placeholder="Data"></input>
+            <input type="text" name="minutes" placeholder="Minutos"></input>
+            <br>
+            <br>
+            <input type="submit" value="Registrar"></input>
+        </form>
+        <br>
+        <form action="/get_student" method="post">
+            <input type="text" name="student_name2" placeholder="Nome do aluno"></input>
+            <input type="text" name="grade2" placeholder="Turma"></input>
+            <br>
+            <br>
+            <input type="submit" value="Puxar atrasos"></input>
+        </form>
+        <a>=====================================================</a>
+        <form action="/train" method="post">
+            <input type="text" name="iterations" placeholder="Iterações"></input>
+            <input type="submit" value="Treinar ZenunimY"></input>
+        </form>
+        <br>
+        <form action="/predict_days" method="post">
+            <input type="text" name="student_name" placeholder="Nome do aluno"></input>
+            <input type="text" name="grade" placeholder="Turma"></input>
+            <br>
+            <br>
+            <input type="submit" value="Prever"></input>
+        </form>
+
+        <p>Resultado:<p>
+        <p>{{output | safe}}</p>
+    </div>
+
+</body>
+
+</html>
