@@ -46,6 +46,98 @@ def get_student():
             output += name_ + " atrasou " + minutes + " minutos dia " + date + "<br>"
     return render_template('index.html', output=output)
 
+def sort_students_by_late_days(student_list):
+    def late_days_key(student):
+        return int(student[1])
+    sorted_student_list = sorted(student_list, key=late_days_key, reverse=True)
+    
+    return sorted_student_list
+    
+def sort_students_by_minutes(student_list):
+    def late_days_key(student):
+        return int(student[2])
+    sorted_student_list = sorted(student_list, key=late_days_key, reverse=True)
+    
+    return sorted_student_list
+
+@app.route('/frequency_rank', methods=['POST'])
+def frequency_rank():
+    output = ""
+    late_days = open("late_days.txt", "r").readlines()
+    
+    students = {}
+    
+    for line in late_days:
+        data = line.split(";")
+        name = data[0]
+            
+        new_student = {
+        "late_days": 0,
+        "minutes": 0
+        }
+        students[name] = new_student
+    
+    for line in late_days:
+        data = line.split(";")
+        name = data[0]
+        grade = data[1]
+        date = data[2]
+        minutes = data[3]
+        late_days_ = data[4]
+        students[name]["late_days"] += int(late_days_)
+        students[name]["minutes"] += int(minutes)
+            
+    student_list = []
+    
+    for name, data in students.items():
+        student_list.append([name, str(data["late_days"]), str(data["minutes"])])
+        
+    student_list = sort_students_by_late_days(student_list)
+    
+    for i in range(0, len(student_list)):
+        output += str(i) + ". " + student_list[i][0] + ", " + student_list[i][1] + " atrasos, " + student_list[i][2] + " minutos<br>"
+
+    return render_template('index.html', output=output)
+   
+@app.route('/minutes_rank', methods=['POST'])
+def minutes_rank():
+    output = ""
+    late_days = open("late_days.txt", "r").readlines()
+    
+    students = {}
+    
+    for line in late_days:
+        data = line.split(";")
+        name = data[0]
+            
+        new_student = {
+        "late_days": 0,
+        "minutes": 0
+        }
+        students[name] = new_student
+    
+    for line in late_days:
+        data = line.split(";")
+        name = data[0]
+        grade = data[1]
+        date = data[2]
+        minutes = data[3]
+        late_days_ = data[4]
+        students[name]["late_days"] += int(late_days_)
+        students[name]["minutes"] += int(minutes)
+            
+    student_list = []
+    
+    for name, data in students.items():
+        student_list.append([name, str(data["late_days"]), str(data["minutes"])])
+        
+    student_list = sort_students_by_minutes(student_list)
+    
+    for i in range(0, len(student_list)):
+        output += str(i) + ". " + student_list[i][0] + ", " + student_list[i][1] + " atrasos, " + student_list[i][2] + " minutos<br>"
+
+    return render_template('index.html', output=output)
+
 def load_neurons(neurons_file):
     neurons = []
     neurons_aux = neurons_file.replace("[", "").replace("]", "").replace(" ", "").split(",")
@@ -237,11 +329,6 @@ def train_ai():
 def predict_days():
     name = unidecode(request.form['student_name']).lower()
     grade = request.form['grade']
-    late_amount = 0
-    late_days = open("late_days.txt", "r").readlines()
-    for line in late_days:
-        if name in line and line.split(";")[1] == grade:
-            late_amount += 1
 
     neuron_layers = [[], [], [], []]
     neurons_ever = 0
@@ -342,16 +429,13 @@ def predict_days():
         predictions[i][1] = month_
         predictions[i][2] = minutes_
         print("fixed prediction: " + str(predictions[i]))
-    counter = 0
+
     for prediction in predictions:
-        if counter == late_amount * 4:
-            break
         if int(sigmoid(prediction[2])*60) == 0 or int(sigmoid(prediction[0])*31) == 0 or int(sigmoid(prediction[1])*12) == 0:
             continue
         output += name + " se atrasou " + str(int(sigmoid(prediction[2])*60)) + " minutos " + "no dia " + str(int(sigmoid(prediction[0])*31)) + "/" + str(int(sigmoid(prediction[1])*12)) + "<br>"
-        counter += 1
     return render_template('index.html', output=output)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
