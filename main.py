@@ -64,6 +64,7 @@ def sort_students_by_minutes(student_list):
 def frequency_rank():
     output = ""
     late_days = open("late_days.txt", "r").readlines()
+    minutes_total = 0
     
     students = {}
     
@@ -83,8 +84,9 @@ def frequency_rank():
         grade = data[1]
         date = data[2]
         minutes = data[3]
+        minutes_total += int(minutes)
         late_days_ = data[4]
-        students[name]["late_days"] += int(late_days_)
+        students[name]["late_days"] += 1
         students[name]["minutes"] += int(minutes)
             
     student_list = []
@@ -96,7 +98,7 @@ def frequency_rank():
     
     for i in range(0, len(student_list)):
         output += str(i) + ". " + student_list[i][0] + ", " + student_list[i][1] + " atrasos, " + student_list[i][2] + " minutos<br>"
-
+    print("Total minutes: " + str(minutes_total))
     return render_template('index.html', output=output)
    
 @app.route('/minutes_rank', methods=['POST'])
